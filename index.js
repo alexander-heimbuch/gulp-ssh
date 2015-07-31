@@ -32,28 +32,23 @@ function GulpSSH (options) {
   this.ssh2 = new Client()
   this.ssh2
     .on('connect', function () {
-      gutil.log(packageName + ' :: Connect...')
       ctx.emit('connect')
     })
     .on('ready', function () {
-      gutil.log(packageName + ' :: Ready')
       ctx._connecting = false
       ctx._connected = true
       flushReady(ctx)
       ctx.emit('ready')
     })
     .on('error', function (err) {
-      gutil.colors.red(new gutil.PluginError(packageName, err))
       ctx.emit('error', err)
     })
     .on('end', function () {
-      gutil.log(packageName + ' :: End')
       ctx._connecting = false
       ctx._connected = false
       ctx.emit('end')
     })
     .on('close', function (hadError) {
-      gutil.log(packageName + ' :: Close')
       ctx._connecting = false
       ctx._connected = false
       ctx.emit('close', hadError)
@@ -124,9 +119,9 @@ GulpSSH.prototype.exec = function (commands, options) {
     var command = commands.shift()
     if (typeof command !== 'string') return execCommand()
 
-    gutil.log(packageName + ' :: Executing :: ' + command)
     ssh.exec(command, options, function (err, stream) {
-      if (err) return outStream.emit('error', new gutil.PluginError(packageName, err))
+      if (err !== undefined) return outStream.emit('error', new gutil.PluginError(packageName, err))
+
       stream
         .on('data', function (chunk) {
           chunkSize += chunk.length
@@ -139,9 +134,14 @@ GulpSSH.prototype.exec = function (commands, options) {
             outStream.emit('error', new gutil.PluginError(packageName, message))
           }
         })
+        .on('error', function (chunk) {
+            chunkSize += chunk.length
+            chunks.push(chunk)
+            outStream.emit('ssh2Data', chunk)
+        })
         .on('close', execCommand)
         .stderr.on('data', function (data) {
-          outStream.emit('error', new gutil.PluginError(packageName, data + ''))
+          outStream.emit('error', data)
         })
     })
   }
@@ -327,7 +327,6 @@ GulpSSH.prototype.shell = function (commands, options) {
       var lastCommand
       commands.forEach(function (command) {
         if (command[command.length - 1] !== '\n') command += '\n'
-        gutil.log(packageName + ' :: shell :: ' + command)
         stream.write(command)
         lastCommand = command
       })
