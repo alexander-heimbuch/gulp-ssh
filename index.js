@@ -123,6 +123,7 @@ GulpSSH.prototype.exec = function (commands, options) {
           outStream.emit('ssh2Data', chunk)
         })
         .on('exit', function (code, signalName, didCoreDump, description) {
+            outStream.emit('exit');
           if (ctx.ignoreErrors === false && code == null) {
             var message = signalName + ', ' + didCoreDump + ', ' + description
             outStream.emit('error', new gutil.PluginError(packageName, message))
