@@ -105,12 +105,6 @@ GulpSSH.prototype.exec = function (commands, options) {
   this.connect().ready(execCommand)
 
   function endStream () {
-    outStream.push(new gutil.File({
-      cwd: __dirname,
-      base: __dirname,
-      path: path.join(__dirname, options.filePath || 'gulp-ssh.exec.log'),
-      contents: Buffer.concat(chunks, chunkSize)
-    }))
     outStream.end()
   }
 
@@ -259,7 +253,7 @@ GulpSSH.prototype.dest = function (destDir, options) {
 
   return through.obj(function (file, encoding, callback) {
     if (file.isNull()) {
-      gutil.log('"' + gutil.colors.cyan(file.path) + '" has no content. Skipping.')
+    gutil.log('"' + gutil.colors.cyan(file.path) + '" has no content. Skipping.')
       return callback()
     }
     getSftp(function (err, sftp) {
@@ -299,12 +293,6 @@ GulpSSH.prototype.shell = function (commands, options) {
   commands = Array.isArray(commands) ? commands.slice() : [commands]
 
   function endStream () {
-    outStream.push(new gutil.File({
-      cwd: __dirname,
-      base: __dirname,
-      path: path.join(__dirname, options.filePath || 'gulp-ssh.exec.log'),
-      contents: Buffer.concat(chunks, chunkSize)
-    }))
     outStream.end()
   }
 
