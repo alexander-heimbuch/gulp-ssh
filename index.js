@@ -139,7 +139,7 @@ GulpSSH.prototype.exec = function (commands, options) {
             outStream.emit('close');
         })
         .stderr.on('data', function (data) {
-          outStream.emit('error', data)
+          outStream.emit('ssh2Data', data)
         })
     })
   }
