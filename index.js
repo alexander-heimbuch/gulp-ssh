@@ -114,7 +114,7 @@ GulpSSH.prototype.exec = function (commands, options) {
     if (typeof command !== 'string') return execCommand()
 
     ssh.exec(command, options, function (err, stream) {
-      if (err !== undefined) return outStream.emit('error', new gutil.PluginError(packageName, err))
+      if (err !== undefined) return //outStream.emit('error', new gutil.PluginError(packageName, err))
 
       stream
         .on('data', function (chunk) {
@@ -191,7 +191,7 @@ GulpSSH.prototype.sftp = function (command, filePath, options) {
     outStream = through.obj()
     ctx.ready(function () {
       ssh.sftp(function (err, sftp) {
-        if (err) return outStream.emit('error', new gutil.PluginError(packageName, err))
+        if (err) return; //outStream.emit('error', new gutil.PluginError(packageName, err))
         var read = sftp.createReadStream(filePath, options)
         options.base = options.base || ''
 
@@ -201,7 +201,7 @@ GulpSSH.prototype.sftp = function (command, filePath, options) {
             chunks.push(chunk)
           })
           .on('error', function (err) {
-            outStream.emit('error', err)
+            //outStream.emit('error', err)
           })
           .on('end', function () {
             outStream.push(new gutil.File({
@@ -313,7 +313,7 @@ GulpSSH.prototype.shell = function (commands, options) {
         })
         .on('close', endStream)
         .stderr.on('data', function (data) {
-        outStream.emit('error', new gutil.PluginError(packageName, data + ''))
+        //outStream.emit('ssh2', new gutil.PluginError(packageName, data + ''))
       })
 
       var lastCommand
